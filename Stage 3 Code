@@ -1,0 +1,42 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+
+# Step 1: Read data from Excel file
+data = pd.read_excel("Copy of 3rd_phase(1).xlsx")  # Replace "your_file.xlsx" with your Excel file path
+
+# Step 2: Define the inputs and output
+X = data[["cycle", "load"]].values  # Two inputs: 'load' and 'cycle'
+y = data["RA"].values  # Output: 'RA'
+
+# Step 3: Split the data into training and testing sets (70% training, 30% testing)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Step 4: Perform Polynomial Regression with degree 2
+degree = 2
+poly = PolynomialFeatures(degree=degree)
+X_train_poly = poly.fit_transform(X_train)  # Transform the training set
+X_test_poly = poly.transform(X_test)  # Transform the testing set
+
+model = LinearRegression()
+model.fit(X_train_poly, y_train)
+
+# Step 5: Predict values for training and testing sets
+y_train_pred = model.predict(X_train_poly)
+y_test_pred = model.predict(X_test_poly)
+
+# Step 6: Plot actual vs. predicted for training and testing sets
+plt.figure(figsize=(10, 5))
+
+
+unknown_input = [[6000, 10000]]  # Example unknown Load and Cycle values
+
+# Transform the unknown input to match the polynomial transformation
+unknown_input_poly = poly.transform(unknown_input)
+
+# Predict the output for the unknown input
+predicted_value = model.predict(unknown_input_poly)
+
+print(f'Predicted value for {unknown_input}:', predicted_value)
